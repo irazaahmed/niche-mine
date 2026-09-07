@@ -76,8 +76,9 @@ export default async function RootPage() {
         <div className="glow-orb animate-float-slow absolute left-1/2 top-1/4 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 [--glow:color-mix(in_srgb,var(--color-accent)_14%,transparent)]" />
       </div>
 
-      <header className="mx-auto flex w-full max-w-5xl items-center justify-between py-6">
-        <span className="flex items-center gap-2.5">
+      <header className="glass sticky top-0 z-30 -mx-4 px-4 py-4 sm:mx-0 sm:rounded-b-2xl sm:px-6">
+        <div className="mx-auto grid w-full max-w-5xl grid-cols-3 items-center">
+        <span className="flex items-center gap-2.5 justify-self-start">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/15 text-accent-bright">
             <BrandGlyph size={16} />
           </span>
@@ -85,18 +86,22 @@ export default async function RootPage() {
             Niche<span className="text-accent">Mine</span>
           </span>
         </span>
-        <nav className="flex items-center gap-5">
-          <a href="#how-it-works" className="hidden text-sm text-muted transition-colors hover:text-foreground sm:inline">
+
+        <nav className="hidden items-center gap-6 justify-self-center sm:flex">
+          <a href="#how-it-works" className="text-sm text-muted transition-colors hover:text-foreground">
             How it works
           </a>
           <a
             href="https://www.cybrumsolutions.dev/contact"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden text-sm text-muted transition-colors hover:text-foreground sm:inline"
+            className="text-sm text-muted transition-colors hover:text-foreground"
           >
             Contact
           </a>
+        </nav>
+
+        <div className="flex items-center gap-3 justify-self-end">
           <ThemeToggle />
           {user ? (
             <Link
@@ -113,7 +118,8 @@ export default async function RootPage() {
               </Button>
             </Link>
           )}
-        </nav>
+        </div>
+        </div>
       </header>
 
       <main className="mx-auto flex w-full max-w-3xl flex-col items-center gap-8 py-16 text-center">
