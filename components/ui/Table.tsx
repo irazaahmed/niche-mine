@@ -24,7 +24,7 @@ function Head({ children }: { children: ReactNode }) {
 }
 
 function Th({ children, className }: { children?: ReactNode; className?: string }) {
-  return <th className={cx("px-5 py-3 font-medium", className)}>{children}</th>;
+  return <th className={cx("whitespace-nowrap px-4 py-2.5 font-medium", className)}>{children}</th>;
 }
 
 function Body({ children }: { children: ReactNode }) {
@@ -51,7 +51,12 @@ function Td({
   return (
     <td
       colSpan={colSpan}
-      className={cx("px-5 py-3", muted ? "text-muted" : "text-foreground", numeric && "tabular-nums", className)}
+      className={cx(
+        "whitespace-nowrap px-4 py-2.5",
+        muted ? "text-muted" : "text-foreground",
+        numeric && "tabular-nums",
+        className
+      )}
     >
       {children}
     </td>

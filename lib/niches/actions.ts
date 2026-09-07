@@ -67,11 +67,17 @@ export async function generateSeedPrompt(
         {
           role: "system",
           content:
-            "You write a short, copy-pasteable prompt that the user will paste into ChatGPT or Claude to brainstorm seed keyword ideas — this prompt is NOT run in Ahrefs itself. " +
-            "Output ONLY the prompt text itself, 2-4 sentences, no preamble, no markdown headers. " +
-            "It must: (1) ask for a list of ~20-30 candidate keyword ideas built around the user's rough idea and modifier pattern (e.g. 'AI [Keyword]'), " +
-            "(2) tell it to keep results relevant to that seed idea, and " +
-            "(3) mention that each idea will then be checked one by one in Ahrefs Keywords Explorer against the given filters, so the ideas should be varied enough that some will likely clear those filters.",
+            "You write a copy-pasteable prompt that the user will paste into ChatGPT or Claude to brainstorm a batch of candidate seed keywords for niche research. " +
+            "This generated prompt is NOT run in Ahrefs — it's run in a chat AI first, and the resulting ideas get checked in Ahrefs afterward. " +
+            "Output ONLY the prompt text itself (plain text, no markdown headers, no preamble or meta-commentary about what you're doing).\n\n" +
+            "The prompt you write must instruct ChatGPT/Claude to:\n" +
+            "1. Generate 30-40 distinct keyword ideas built around the user's rough idea and modifier pattern.\n" +
+            "2. Vary the angle — mix informational ('how to..', 'what is..'), commercial ('best..', '..for beginners', '..vs..'), and audience-specific variants — not just repeats of the same head term with one word swapped.\n" +
+            "3. Lean toward longer-tail, more specific phrasing over single broad head terms, since broad terms tend to already be claimed by high-authority sites.\n" +
+            "4. Avoid near-duplicate variants that would obviously fail the same Ahrefs filters together (e.g. singular/plural pairs, minor word-order swaps) — every idea should be a genuinely distinct bet.\n" +
+            "5. Output as a plain list, one keyword per line, no numbering or bullets, no extra commentary — so each line can be pasted straight into Ahrefs Keywords Explorer.\n" +
+            "6. Mention that each idea will be checked one by one in Ahrefs against the filters given, so the batch should be varied enough that a good fraction clears the bar.\n\n" +
+            "Keep the prompt itself tight despite covering all of this — aim for well under 150 words.",
         },
         {
           role: "user",
