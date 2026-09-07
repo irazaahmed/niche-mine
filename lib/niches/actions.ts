@@ -60,6 +60,10 @@ export async function generateSeedPrompt(
     await assertAiCallAllowed(userId);
 
     const parsedFilters = seedPromptFilters.parse(filters);
+    const supabase = await createClient();
+    const { data: nicheRow } = await supabase.from("niches").select("country").eq("id", nicheId).single();
+    const country = nicheRow?.country ?? "my target country";
+
     const openai = getOpenAI();
     const completion = await openai.chat.completions.create({
       model: AI_MODEL_LIGHT,
@@ -67,25 +71,19 @@ export async function generateSeedPrompt(
         {
           role: "system",
           content:
-            "You write a copy-pasteable prompt that the user will paste into ChatGPT or Claude to brainstorm a batch of candidate seed keywords for niche research. " +
-            "This generated prompt is NOT run in Ahrefs — it's run in a chat AI first, and the resulting ideas get checked in Ahrefs afterward. " +
-            "Output ONLY the prompt text itself (plain text, no markdown headers, no preamble or meta-commentary about what you're doing).\n\n" +
-            "The prompt you write must instruct ChatGPT/Claude to:\n" +
-            "1. Generate 30-40 distinct keyword ideas built around the user's rough idea and modifier pattern.\n" +
-            "2. Vary the angle — mix informational ('how to..', 'what is..'), commercial ('best..', '..for beginners', '..vs..'), and audience-specific variants — not just repeats of the same head term with one word swapped.\n" +
-            "3. Lean toward longer-tail, more specific phrasing over single broad head terms, since broad terms tend to already be claimed by high-authority sites.\n" +
-            "4. Avoid near-duplicate variants that would obviously fail the same Ahrefs filters together (e.g. singular/plural pairs, minor word-order swaps) — every idea should be a genuinely distinct bet.\n" +
-            "5. Output as a plain list, one keyword per line, no numbering or bullets, no extra commentary — so each line can be pasted straight into Ahrefs Keywords Explorer.\n" +
-            "6. Mention that each idea will be checked one by one in Ahrefs against the filters given, so the batch should be varied enough that a good fraction clears the bar.\n\n" +
-            "Keep the prompt itself tight despite covering all of this — aim for well under 150 words.",
+            "You write a short, casual, first-person prompt that the user will paste into ChatGPT or Claude. " +
+            "The user wants ChatGPT/Claude to generate a stream of SHORT keyword combinations (2-4 words each) built around their modifier pattern — " +
+            "not long-tail phrases, not explanations, not full sentences. Each combination is something they'll type directly into Ahrefs Keywords Explorer's empty search box (no seed keyword typed in Ahrefs itself, just a country selected) to see what volume/difficulty comes back for it. " +
+            "Output ONLY the prompt text itself (plain text, first person, no markdown, no headers, no preamble).\n\n" +
+            "Model the prompt on this exact shape (adapt the wording and examples to the user's own modifier pattern below, don't reuse this text verbatim):\n" +
+            '"Hey, I\'m using Ahrefs Keywords Explorer with an empty search, just [country] selected as the country. Help me find short combinations of \'AI [Keyword]\' — mix up where the word goes and add modifiers, e.g. \'AI Tool\', \'Tool AI\', \'Buy AI Software\', \'AI for Beginners\'. I\'m trying to find low-competition AI niches. Keep answers short — just the list of combinations, no explanations — until I say otherwise."\n\n' +
+            "Requirements: (1) mention the country and that Ahrefs is searched with no seed keyword typed in, just that country selected, (2) give 3-4 short example combinations using the user's own modifier pattern to show the variety wanted (word before/after, plus a commercial verb like buy/best/get, plus an audience/purpose modifier), (3) state the goal is finding low-competition niches (mention their include-text filter if given), (4) explicitly tell it to keep every answer short — just a plain list of combinations, no explanations — until told otherwise, since this will be an ongoing back-and-forth. Keep the whole prompt to 3-4 sentences.",
         },
         {
           role: "user",
-          content: `Rough idea / modifier pattern: ${roughIdea}\nFilters the user will apply per-idea in Ahrefs afterward: DR of top 10 results <= ${
-            parsedFilters.dr_top10_max ?? "n/a"
-          }, minimum search volume >= ${parsedFilters.min_volume ?? "n/a"}, include text: "${
+          content: `Modifier pattern: ${roughIdea}\nTarget country: ${country}\nInclude text filter (if any): ${
             parsedFilters.include_text ?? "n/a"
-          }".`,
+          }`,
         },
       ],
     });
@@ -93,7 +91,6 @@ export async function generateSeedPrompt(
     const prompt = completion.choices[0]?.message?.content?.trim();
     if (!prompt) throw new Error("AI did not return a prompt.");
 
-    const supabase = await createClient();
     const { data, error } = await supabase
       .from("seed_keyword_batches")
       .insert({ niche_id: nicheId, ai_prompt_used: prompt, filters_applied: parsedFilters })
