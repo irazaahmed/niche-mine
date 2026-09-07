@@ -19,7 +19,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <div className="glow-orb animate-float-slow absolute right-[-14%] top-[-12%] h-[30rem] w-[30rem] [--glow:color-mix(in_srgb,var(--color-accent)_9%,transparent)]" />
         </div>
 
-        <DashboardSidebar email={email} isAdmin={isAdmin} signOutAction={signOutAction} />
+        <DashboardSidebar
+          email={email}
+          isAdmin={isAdmin}
+          aiCallsRemaining={Math.max(profile.ai_calls_limit - profile.ai_calls_count, 0)}
+          aiCallsLimit={profile.ai_calls_limit}
+          signOutAction={signOutAction}
+        />
 
         {/* Mobile / tablet top bar */}
         <div className="fixed inset-x-0 top-0 z-30 border-b border-border bg-surface/80 backdrop-blur-md lg:hidden">
@@ -28,6 +34,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
               NicheMine
             </Link>
             <div className="flex shrink-0 items-center gap-3">
+              <Link href="/usage" className="text-xs text-muted">
+                {Math.max(profile.ai_calls_limit - profile.ai_calls_count, 0)}/{profile.ai_calls_limit} AI
+              </Link>
               {isAdmin && (
                 <Link href="/admin" className="text-xs font-medium text-accent-bright">
                   Admin

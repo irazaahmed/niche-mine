@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { BrandGlyph } from "@/components/ui/BrandMark";
-import { TargetIcon, SparklesIcon, BarChartIcon } from "@/components/ui/icons";
+import { TargetIcon, SparklesIcon, BarChartIcon, ArrowRightIcon } from "@/components/ui/icons";
 
 const FEATURES = [
   {
@@ -70,8 +69,6 @@ export default async function RootPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user) redirect("/dashboard");
-
   return (
     <div className="relative flex min-h-screen flex-col px-4">
       <div aria-hidden className="fixed inset-0 -z-10 overflow-hidden bg-background">
@@ -101,11 +98,21 @@ export default async function RootPage() {
             Contact
           </a>
           <ThemeToggle />
-          <Link href="/login">
-            <Button variant="outline" type="button">
-              Log in
-            </Button>
-          </Link>
+          {user ? (
+            <Link
+              href="/dashboard"
+              title="Go to your dashboard"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/15 text-sm font-semibold text-accent-bright transition-colors hover:bg-accent/25"
+            >
+              {(user.email ?? "?").charAt(0).toUpperCase()}
+            </Link>
+          ) : (
+            <Link href="/login">
+              <Button variant="outline" type="button">
+                Log in
+              </Button>
+            </Link>
+          )}
         </nav>
       </header>
 
@@ -121,16 +128,29 @@ export default async function RootPage() {
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <Link href="/signup">
-            <Button variant="primary" type="button">
-              Sign up
-            </Button>
-          </Link>
-          <Link href="/login">
-            <Button variant="outline" type="button">
-              Log in
-            </Button>
-          </Link>
+          {user ? (
+            <Link href="/dashboard">
+              <Button variant="primary" type="button">
+                <span className="inline-flex items-center gap-2">
+                  Enter Workspace
+                  <ArrowRightIcon className="h-4 w-4" />
+                </span>
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link href="/signup">
+                <Button variant="primary" type="button">
+                  Sign up
+                </Button>
+              </Link>
+              <Link href="/login">
+                <Button variant="outline" type="button">
+                  Log in
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -155,7 +175,21 @@ export default async function RootPage() {
           </p>
         </div>
 
-        <ol className="mt-8 flex flex-col gap-3">
+        <Card className="mt-8 text-left">
+          <p className="font-heading text-sm font-semibold text-accent-bright">Why &ldquo;NicheMine&rdquo;?</p>
+          <p className="mt-2 text-sm text-muted">
+            Mining is digging through a lot of ordinary rock to find the rare vein of gold underneath — you don&apos;t
+            strike it on the surface, and you don&apos;t strike it by luck either. You follow the data, test the
+            ground, and rule out where <em>not</em> to dig. Keyword research works the same way: inside a huge
+            Ahrefs export, most keywords are already claimed by sites with real authority — but a few are still
+            low-competition and high-volume, sitting there unclaimed. NicheMine is the tool for that dig. It
+            doesn&apos;t do the digging for you — you still swing the pickaxe in Ahrefs — but it tracks every seed
+            keyword, every competitor you check, and every vein that actually pans out, so nothing gets lost while
+            you work the site.
+          </p>
+        </Card>
+
+        <ol className="mt-6 flex flex-col gap-3">
           {STEPS.map((step, i) => (
             <li key={step.title}>
               <Card className="flex items-start gap-4 text-left" padding="md">

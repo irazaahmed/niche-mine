@@ -6,7 +6,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { SidebarNav } from "./SidebarNav";
 import { BrandGlyph } from "./BrandMark";
 import { cx } from "./cx";
-import { ShieldIcon, LogOutIcon, PanelLeftCloseIcon, PanelLeftOpenIcon } from "./icons";
+import { ShieldIcon, LogOutIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, SparklesIcon } from "./icons";
 
 const STORAGE_KEY = "nichemine-sidebar-collapsed";
 
@@ -17,10 +17,14 @@ const STORAGE_KEY = "nichemine-sidebar-collapsed";
 export function DashboardSidebar({
   email,
   isAdmin,
+  aiCallsRemaining,
+  aiCallsLimit,
   signOutAction,
 }: {
   email: string;
   isAdmin: boolean;
+  aiCallsRemaining: number;
+  aiCallsLimit: number;
   signOutAction: (formData: FormData) => void;
 }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -76,6 +80,22 @@ export function DashboardSidebar({
       </div>
 
       <SidebarNav variant="desktop" collapsed={collapsed} />
+
+      <Link
+        href="/usage"
+        title={collapsed ? `${aiCallsRemaining} of ${aiCallsLimit} AI queries left today` : undefined}
+        className={cx(
+          "mt-3 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-muted transition-colors hover:bg-accent/10 hover:text-foreground",
+          collapsed && "justify-center px-0"
+        )}
+      >
+        <SparklesIcon className="h-3.5 w-3.5 shrink-0" />
+        {!collapsed && (
+          <span>
+            {aiCallsRemaining}/{aiCallsLimit} AI queries today
+          </span>
+        )}
+      </Link>
 
       {isAdmin && (
         <Link
