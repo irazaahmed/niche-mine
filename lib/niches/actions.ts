@@ -143,14 +143,33 @@ export async function attachCsvBatch(
 // ---------------------------------------------------------------------
 // Step 7: AI suggests the most promising keyword from the parsed table.
 // ---------------------------------------------------------------------
+export interface KeywordSuggestion {
+  found: boolean;
+  keyword: string | null;
+  reasoning: string;
+  nextSearch: string | null;
+}
+
 export async function suggestKeyword(
   batchId: string,
   headers: string[],
   rows: Record<string, string | number | null>[]
-): Promise<ActionResult<{ keyword: string; reasoning: string }>> {
+): Promise<ActionResult<KeywordSuggestion>> {
   try {
     const { id: userId } = await requireUser();
     await assertAiCallAllowed(userId);
+
+    const supabase = await createClient();
+    const { data: batchRow } = await supabase
+      .from("seed_keyword_batches")
+      .select("niche_id")
+      .eq("id", batchId)
+      .single();
+    let country = "unspecified";
+    if (batchRow?.niche_id) {
+      const { data: nicheRow } = await supabase.from("niches").select("country").eq("id", batchRow.niche_id).single();
+      if (nicheRow?.country) country = nicheRow.country;
+    }
 
     // Cap the sample sent to the model — a 5k-row Ahrefs export doesn't
     // need to be fully replayed for a "pick the best one" judgment call.
@@ -163,26 +182,47 @@ export async function suggestKeyword(
         {
           role: "system",
           content:
-            "You are helping pick the single most promising keyword from an Ahrefs Keywords Explorer export for a low-competition, high-volume niche site. " +
-            'Favor high volume with a low top-10 Difficulty/DR. Reply as JSON: {"keyword": string, "reasoning": string (1-2 sentences)}.',
+            "You are helping pick ONE promising keyword from an Ahrefs Keywords Explorer export, to pursue as a NANO-NICHE website topic.\n\n" +
+            "Niche levels (narrowest wins): Macro/Sub-niche is broad (e.g. 'Cricket'), Micro-niche is narrower (e.g. 'PSL 2026'), Nano-niche is very specific (e.g. 'PSL 2026 Teams'). " +
+            "Nano niches are the easiest to rank for and are the goal here. " +
+            "NEVER pick a broad single- or two-word head term (e.g. just 'AI', 'AI Tools', 'AI Software') even if its raw volume looks huge — those are macro/micro-level and already claimed by high-authority sites. " +
+            "Prefer a specific, problem-solving phrase that names a concrete tool, task, audience, or use case over a generic head term, even if its volume is smaller — specificity beats raw volume here.\n\n" +
+            "Favor high volume with low competition (lowest available top-10 DR/KD/Difficulty column). Rough search-volume benchmarks by market tier (from the target country given): " +
+            "Tier-1 countries (US, UK, Australia, Western Europe) — roughly 15k+ monthly volume is workable since CPC is high; " +
+            "Tier-2 countries (South Asia, Southeast Asia, and similar lower-CPC markets) — roughly 30k+ is preferred since more traffic is needed to earn the same amount; " +
+            "if the country doesn't clearly fit either tier, just apply the general 'higher volume, lower competition, more specific' principle.\n\n" +
+            "If NONE of the rows are a genuinely good nano-niche pick (every row is a broad head term, or fails the volume/competition bar for the given country), do not force a pick. " +
+            "Instead set found=false, keyword=null, explain in reasoning why nothing here qualifies, and use nextSearch to recommend a concrete next search to run in Ahrefs Keywords Explorer — a specific volume threshold (a number), a specific DR threshold for the top 10 or top 5 results (a number), and one or two specific include-text words/phrases worth searching for next, based on patterns you noticed in this data.\n\n" +
+            'Reply as JSON: {"found": boolean, "keyword": string | null, "reasoning": string (1-2 sentences), "nextSearch": string | null (only when found is false — a concrete instruction like "Search Ahrefs with min volume 10000, top-10 DR under 20, include text \'X\'")}.',
         },
         {
           role: "user",
-          content: `Columns: ${headers.join(", ")}\nRows (JSON):\n${JSON.stringify(sample)}`,
+          content: `Target country: ${country}\nColumns: ${headers.join(", ")}\nRows (JSON):\n${JSON.stringify(sample)}`,
         },
       ],
     });
 
     const raw = completion.choices[0]?.message?.content;
     if (!raw) throw new Error("AI did not return a suggestion.");
-    const parsed = z.object({ keyword: z.string(), reasoning: z.string() }).parse(JSON.parse(raw));
+    const parsed = z
+      .object({
+        found: z.boolean(),
+        keyword: z.string().nullable(),
+        reasoning: z.string(),
+        nextSearch: z.string().nullable().optional(),
+      })
+      .parse(JSON.parse(raw));
 
     await recordAiCall(userId, "suggested_keyword", {
       batch_id: batchId,
+      found: parsed.found,
       keyword: parsed.keyword,
       tokens: completion.usage,
     });
-    return { ok: true, data: parsed };
+    return {
+      ok: true,
+      data: { found: parsed.found, keyword: parsed.keyword, reasoning: parsed.reasoning, nextSearch: parsed.nextSearch ?? null },
+    };
   } catch (error) {
     return fail(error);
   }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { suggestKeyword, selectKeyword } from "@/lib/niches/actions";
+import { suggestKeyword, selectKeyword, type KeywordSuggestion } from "@/lib/niches/actions";
 import { StepCard } from "./StepCard";
 import { KeywordDataTable } from "./KeywordDataTable";
 import { Button } from "@/components/ui/Button";
@@ -20,7 +20,7 @@ export function KeywordSelectionStep({
   parsedData: { headers: string[]; rows: Record<string, string | number | null>[] } | null;
   existing: { keyword: string; volume: number | null } | null;
 }) {
-  const [suggestion, setSuggestion] = useState<{ keyword: string; reasoning: string } | null>(null);
+  const [suggestion, setSuggestion] = useState<KeywordSuggestion | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -63,11 +63,23 @@ export function KeywordSelectionStep({
 
           {error && <StatusBanner tone="danger">{error}</StatusBanner>}
 
-          {suggestion && (
+          {suggestion && suggestion.found && (
             <Surface>
               <p className="font-medium text-foreground">{suggestion.keyword}</p>
               <p className="mt-1 text-sm text-muted">{suggestion.reasoning}</p>
             </Surface>
+          )}
+
+          {suggestion && !suggestion.found && (
+            <StatusBanner tone="warning">
+              <p className="font-medium">No good nano-niche match in this list.</p>
+              <p className="mt-1">{suggestion.reasoning}</p>
+              {suggestion.nextSearch && (
+                <p className="mt-2">
+                  <span className="font-medium">Try next in Ahrefs:</span> {suggestion.nextSearch}
+                </p>
+              )}
+            </StatusBanner>
           )}
 
           <KeywordDataTable headers={parsedData.headers} rows={parsedData.rows} />
@@ -79,7 +91,7 @@ export function KeywordSelectionStep({
               <Label htmlFor="keyword" size="sm" muted>
                 Keyword
               </Label>
-              <Input id="keyword" name="keyword" required defaultValue={suggestion?.keyword ?? ""} />
+              <Input id="keyword" name="keyword" required defaultValue={(suggestion?.found && suggestion.keyword) || ""} />
             </div>
             <div className="w-36">
               <Label htmlFor="volume" size="sm" muted>
