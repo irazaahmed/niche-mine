@@ -3,9 +3,9 @@ import { requireUser } from "@/lib/current-user";
 import { signOutAction } from "@/lib/auth/actions";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { SidebarNav } from "@/components/ui/SidebarNav";
+import { DashboardSidebar } from "@/components/ui/DashboardSidebar";
 import { ToastProvider } from "@/components/ui/ToastProvider";
 import { StatusBanner } from "@/components/ui/StatusBanner";
-import { BrandGlyph } from "@/components/ui/BrandMark";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { email, profile } = await requireUser();
@@ -19,52 +19,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <div className="glow-orb animate-float-slow absolute right-[-14%] top-[-12%] h-[30rem] w-[30rem] [--glow:color-mix(in_srgb,var(--color-accent)_9%,transparent)]" />
         </div>
 
-        <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-surface p-4 lg:sticky lg:top-0 lg:flex lg:h-screen lg:overflow-y-auto">
-          <div className="flex items-center gap-2.5 px-2 pb-4">
-            <Link href="/dashboard" className="flex min-w-0 flex-1 items-center gap-2.5">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent-bright">
-                <BrandGlyph size={16} />
-              </span>
-              <p className="min-w-0 flex-1 truncate font-heading font-semibold tracking-tight">NicheMine</p>
-            </Link>
-            <ThemeToggle />
-          </div>
-
-          <SidebarNav variant="desktop" />
-
-          {isAdmin && (
-            <Link
-              href="/admin"
-              className="mt-4 flex items-center gap-1.5 rounded-lg border border-accent/25 bg-accent/5 px-3 py-2 text-sm text-accent-bright transition-colors hover:bg-accent/15"
-            >
-              Admin
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
-              </svg>
-            </Link>
-          )}
-
-          <div className="mt-auto pt-6">
-            <p className="truncate px-3 text-xs text-muted">{email}</p>
-            <form action={signOutAction}>
-              <button
-                type="submit"
-                className="mt-1 w-full rounded-lg px-3 py-2 text-left text-sm text-muted transition-colors hover:bg-surface hover:text-foreground"
-              >
-                Sign out
-              </button>
-            </form>
-          </div>
-
-          <a
-            href="https://www.cybrumsolutions.dev"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-1 px-3 text-[11px] text-muted transition-colors hover:text-accent-bright"
-          >
-            by Cybrum Solutions
-          </a>
-        </aside>
+        <DashboardSidebar email={email} isAdmin={isAdmin} signOutAction={signOutAction} />
 
         {/* Mobile / tablet top bar */}
         <div className="fixed inset-x-0 top-0 z-30 border-b border-border bg-surface/80 backdrop-blur-md lg:hidden">

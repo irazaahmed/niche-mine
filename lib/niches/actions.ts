@@ -67,13 +67,15 @@ export async function generateSeedPrompt(
         {
           role: "system",
           content:
-            "You write short, copy-pasteable seed-keyword-hunting prompts for a human to run manually in Ahrefs Keywords Explorer (and optionally ChatGPT for brainstorming). " +
-            "Output ONLY the prompt text itself, 2-5 sentences, no preamble, no markdown headers. " +
-            "It should tell the reader what seed term(s) to search, what modifier pattern to try (the user's rough idea, e.g. 'AI [Keyword]'), and remind them to apply the given filters in Ahrefs.",
+            "You write a short, copy-pasteable prompt that the user will paste into ChatGPT or Claude to brainstorm seed keyword ideas — this prompt is NOT run in Ahrefs itself. " +
+            "Output ONLY the prompt text itself, 2-4 sentences, no preamble, no markdown headers. " +
+            "It must: (1) ask for a list of ~20-30 candidate keyword ideas built around the user's rough idea and modifier pattern (e.g. 'AI [Keyword]'), " +
+            "(2) tell it to keep results relevant to that seed idea, and " +
+            "(3) mention that each idea will then be checked one by one in Ahrefs Keywords Explorer against the given filters, so the ideas should be varied enough that some will likely clear those filters.",
         },
         {
           role: "user",
-          content: `Rough idea: ${roughIdea}\nFilters to mention: DR of top 10 results <= ${
+          content: `Rough idea / modifier pattern: ${roughIdea}\nFilters the user will apply per-idea in Ahrefs afterward: DR of top 10 results <= ${
             parsedFilters.dr_top10_max ?? "n/a"
           }, minimum search volume >= ${parsedFilters.min_volume ?? "n/a"}, include text: "${
             parsedFilters.include_text ?? "n/a"
@@ -399,4 +401,17 @@ export async function rejectNiche(formData: FormData): Promise<void> {
   await supabase.from("niches").update({ status: "rejected" }).eq("id", nicheId);
   revalidatePath(`/niches/${nicheId}`);
   revalidatePath("/dashboard");
+}
+
+// ---------------------------------------------------------------------
+// Permanently delete a niche and everything under it (RLS restricts this
+// to the owner or an admin; the FK chain is ON DELETE CASCADE).
+// ---------------------------------------------------------------------
+export async function deleteNiche(formData: FormData): Promise<void> {
+  const nicheId = String(formData.get("nicheId") ?? "");
+  if (!nicheId) return;
+  const supabase = await createClient();
+  await supabase.from("niches").delete().eq("id", nicheId);
+  revalidatePath("/dashboard");
+  redirect("/dashboard");
 }

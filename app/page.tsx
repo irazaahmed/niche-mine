@@ -31,12 +31,16 @@ const STEPS = [
     body: "Pick the country you're targeting in Ahrefs and create a new niche research.",
   },
   {
-    title: "Get a seed-keyword prompt",
-    body: "AI writes a short prompt for Ahrefs Keywords Explorer based on your rough idea (e.g. \"AI [Keyword]\").",
+    title: "Get a seed-idea prompt",
+    body: "AI writes a short prompt for ChatGPT or Claude, built around your rough idea (e.g. \"AI [Keyword]\") and your filters.",
   },
   {
-    title: "Run it in Ahrefs",
-    body: "Apply your filters manually (max DR of top 10, min volume, include text) and export the CSV.",
+    title: "Brainstorm with ChatGPT or Claude",
+    body: "Paste the prompt in — it hands back a list of candidate keyword ideas to work through.",
+  },
+  {
+    title: "Check each idea in Ahrefs",
+    body: "Run every idea through Ahrefs Keywords Explorer with your filters (max DR of top 10, min volume, include text), then export the CSV.",
   },
   {
     title: "Upload the CSV",
@@ -85,8 +89,8 @@ export default async function RootPage() {
           </span>
         </span>
         <nav className="flex items-center gap-5">
-          <a href="#about" className="hidden text-sm text-muted transition-colors hover:text-foreground sm:inline">
-            About
+          <a href="#how-it-works" className="hidden text-sm text-muted transition-colors hover:text-foreground sm:inline">
+            How it works
           </a>
           <a
             href="https://www.cybrumsolutions.dev/contact"
@@ -142,7 +146,7 @@ export default async function RootPage() {
         </div>
       </main>
 
-      <section id="about" className="mx-auto w-full max-w-3xl scroll-mt-10 py-10">
+      <section id="how-it-works" className="mx-auto w-full max-w-3xl scroll-mt-10 py-10">
         <div className="text-center">
           <h2 className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">How it works</h2>
           <p className="mx-auto mt-3 max-w-xl text-sm text-muted">

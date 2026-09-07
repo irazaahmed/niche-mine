@@ -17,9 +17,16 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/usage", label: "AI Usage", icon: BarChartIcon },
 ];
 
-/** Desktop: vertical list with an active-item accent bar. Mobile: flat
- * horizontal pill strip, same active-state color. */
-export function SidebarNav({ variant }: { variant: "desktop" | "mobile" }) {
+/** Desktop: vertical list with an active-item accent bar (or, when
+ * `collapsed`, a centered icon-only rail with the label as a native
+ * tooltip). Mobile: flat horizontal pill strip, same active-state color. */
+export function SidebarNav({
+  variant,
+  collapsed = false,
+}: {
+  variant: "desktop" | "mobile";
+  collapsed?: boolean;
+}) {
   const pathname = usePathname();
 
   if (variant === "mobile") {
@@ -59,15 +66,17 @@ export function SidebarNav({ variant }: { variant: "desktop" | "mobile" }) {
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
+            title={collapsed ? item.label : undefined}
             className={cx(
               "flex items-center gap-2.5 rounded-lg border-l-2 px-3 py-2 text-sm transition-colors",
+              collapsed && "justify-center px-0",
               active
                 ? "border-l-accent bg-accent/10 text-foreground"
                 : "border-l-transparent text-muted hover:bg-accent/10 hover:text-foreground"
             )}
           >
             <Icon className="h-4 w-4 shrink-0" />
-            {item.label}
+            {!collapsed && item.label}
           </Link>
         );
       })}

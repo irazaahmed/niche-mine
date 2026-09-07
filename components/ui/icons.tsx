@@ -165,6 +165,36 @@ export function ArrowRightIcon(props: IconProps) {
   );
 }
 
+export function PanelLeftCloseIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <line x1="9.5" y1="4" x2="9.5" y2="20" />
+      <path d="M6.7 10.5 4.5 12l2.2 1.5" />
+    </svg>
+  );
+}
+
+export function PanelLeftOpenIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <line x1="9.5" y1="4" x2="9.5" y2="20" />
+      <path d="M5.8 10.5 8 12l-2.2 1.5" />
+    </svg>
+  );
+}
+
+export function LogOutIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="M16 17l5-5-5-5" />
+      <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  );
+}
+
 export function SparklesIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>

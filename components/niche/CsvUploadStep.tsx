@@ -95,7 +95,12 @@ export function CsvUploadStep({
   const isPickingSheet = pendingFile && sheetNames.length > 1 && !parsed;
 
   return (
-    <StepCard number={2} title="Upload the Ahrefs CSV export" subtitle="Filtered export from Ahrefs Keywords Explorer" done={saved}>
+    <StepCard
+      number={2}
+      title="Upload the Ahrefs CSV export"
+      subtitle="After checking your ChatGPT/Claude ideas in Ahrefs with your filters"
+      done={saved}
+    >
       {!parsed && !isPickingSheet && (
         <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border bg-surface/40 p-10 text-center transition-colors hover:border-accent">
           <input

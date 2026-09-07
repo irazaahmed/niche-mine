@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Table } from "@/components/ui/Table";
+import { DeleteNicheButton } from "@/components/niche/DeleteNicheButton";
 import { TargetIcon, PlusIcon } from "@/components/ui/icons";
 import type { NicheStatus } from "@/lib/supabase/types";
 
@@ -54,6 +55,7 @@ export default async function DashboardPage() {
             <Table.Th>Status</Table.Th>
             <Table.Th>Started</Table.Th>
             <Table.Th />
+            <Table.Th />
           </Table.Head>
           <Table.Body>
             {niches.map((n) => (
@@ -69,6 +71,9 @@ export default async function DashboardPage() {
                   <Link href={`/niches/${n.id}`} className="text-accent-bright hover:underline">
                     Open →
                   </Link>
+                </Table.Td>
+                <Table.Td>
+                  <DeleteNicheButton nicheId={n.id} />
                 </Table.Td>
               </Table.Row>
             ))}

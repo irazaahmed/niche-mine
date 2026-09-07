@@ -44,7 +44,12 @@ export function SeedPromptStep({
   }
 
   return (
-    <StepCard number={1} title="Generate a seed-keyword prompt" subtitle="AI writes a prompt to run manually in Ahrefs Keywords Explorer" done={!!prompt && !editing}>
+    <StepCard
+      number={1}
+      title="Generate a seed-keyword prompt"
+      subtitle="AI writes a prompt for ChatGPT or Claude to brainstorm keyword ideas"
+      done={!!prompt && !editing}
+    >
       {prompt && !editing && (
         <div className="flex flex-col gap-3">
           <Surface className="whitespace-pre-wrap text-sm text-foreground">{prompt}</Surface>
@@ -60,6 +65,10 @@ export function SeedPromptStep({
               Generate another
             </Button>
           </div>
+          <p className="text-xs text-muted">
+            Next: paste this into ChatGPT or Claude to get a list of keyword ideas. Check each idea one by one in
+            Ahrefs Keywords Explorer with your filters, then export and upload the CSV below.
+          </p>
         </div>
       )}
 

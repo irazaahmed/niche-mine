@@ -2,6 +2,7 @@ import Link from "next/link";
 import { signup } from "@/lib/auth/actions";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { BrandGlyph } from "@/components/ui/BrandMark";
+import { FormSubmitButton } from "@/components/ui/FormSubmitButton";
 
 const inputClass =
   "w-full rounded-xl border border-border bg-surface/60 px-4 py-3 text-sm text-foreground placeholder:text-muted/70 outline-none transition-[border-color,box-shadow] duration-300 focus:border-accent focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-accent)_18%,transparent)]";
@@ -52,12 +53,7 @@ export default async function SignupPage({
 
           {error && <p className="text-sm text-red-400">{error}</p>}
 
-          <button
-            type="submit"
-            className="btn-sheen mt-1 inline-flex h-12 w-full items-center justify-center rounded-full bg-accent font-medium text-white transition-all duration-300 hover:bg-accent-bright hover:shadow-[0_0_36px_-6px_var(--color-accent)]"
-          >
-            Create account
-          </button>
+          <FormSubmitButton pendingLabel="Creating account…">Create account</FormSubmitButton>
         </form>
 
         <p className="mt-6 text-sm text-muted">

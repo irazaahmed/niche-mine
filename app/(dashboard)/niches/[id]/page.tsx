@@ -8,6 +8,7 @@ import { KeywordSelectionStep } from "@/components/niche/KeywordSelectionStep";
 import { CompetitorStep } from "@/components/niche/CompetitorStep";
 import { ReverseEngineeredStep } from "@/components/niche/ReverseEngineeredStep";
 import { FinalizeStep } from "@/components/niche/FinalizeStep";
+import { DeleteNicheButton } from "@/components/niche/DeleteNicheButton";
 import type {
   NicheStatus,
   CompetitorSiteRow,
@@ -101,9 +102,12 @@ export default async function NichePage({ params }: { params: Promise<{ id: stri
           <h1 className="font-heading text-2xl font-semibold tracking-tight">{niche.country}</h1>
           <p className="mt-1 text-sm text-muted">Started {new Date(niche.created_at).toLocaleDateString()}</p>
         </div>
-        <Badge tone={STATUS_TONE[niche.status]} size="lg" dot>
-          {niche.status}
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Badge tone={STATUS_TONE[niche.status]} size="lg" dot>
+            {niche.status}
+          </Badge>
+          <DeleteNicheButton nicheId={nicheId} />
+        </div>
       </div>
 
       <SeedPromptStep nicheId={nicheId} existingPrompt={batch?.ai_prompt_used ?? null} />
