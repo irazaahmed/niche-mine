@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NicheMine
 
-## Getting Started
+A Cybrum Solutions product. A structured workflow tool for finding low-competition, high-volume, profitable niches using Ahrefs (manual research) combined with AI for prompt generation, analysis, and next-step suggestions. See `CLAUDE.md` for the full product spec.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js (App Router) + Tailwind v4
+- Supabase (Postgres + Auth + Storage)
+- OpenAI API (`gpt-4o-mini` for suggestions, `gpt-4o` for final niche scoring)
+
+## Getting started
+
+1. Copy `.env.local.example` to `.env.local` and fill in:
+   - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` from a Supabase project (use `nichemine-dev` for local work)
+   - `OPENAI_API_KEY`
+   - `NEXT_PUBLIC_APP_URL` (defaults to `http://localhost:3000`)
+2. Apply the database schema: run the SQL in `supabase/migrations/0001_init.sql` then `0002_storage.sql` against your Supabase project (via the SQL editor, or `supabase db push` if you have the CLI linked).
+3. In the Supabase dashboard, enable the Google OAuth provider under Authentication if you want Google sign-in, and add `${NEXT_PUBLIC_APP_URL}/auth/callback` as a redirect URL.
+4. `npm install`
+5. `npm run dev` and open [http://localhost:3000](http://localhost:3000)
+
+## Making a user an admin
+
+New signups default to `role = 'user'`. To promote the first admin, run in the Supabase SQL editor:
+
+```sql
+update public.users set role = 'admin' where email = 'you@example.com';
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deploy
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deploys to Vercel with the same env vars. No code hardcodes a domain — everything reads `NEXT_PUBLIC_APP_URL` — so it's portable to a VPS later without changes beyond env vars and swapping the Vercel-specific bits (there aren't any: file storage is Supabase Storage, not Vercel Blob).
