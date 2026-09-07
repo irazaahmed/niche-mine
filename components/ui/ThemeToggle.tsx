@@ -67,7 +67,16 @@ const OPTIONS = [
  * Theme switcher with three choices: Light, Dark, System. The active theme
  * is applied before paint by the inline script in app/layout.tsx (no flash).
  */
-export function ThemeToggle({ className = "" }: { className?: string }) {
+export function ThemeToggle({
+  className = "",
+  align = "right",
+}: {
+  className?: string;
+  /** Which edge the dropdown hangs from. Use "left" when the button sits
+   * near the left edge of the viewport (e.g. the sidebar) so the menu
+   * opens rightward instead of overflowing off-screen. */
+  align?: "left" | "right";
+}) {
   const [open, setOpen] = useState(false);
   const [pref, setPref] = useState<Pref>("light");
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -130,7 +139,9 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
         <div
           role="menu"
           aria-label="Theme"
-          className="glass absolute right-0 z-[60] mt-2 w-36 overflow-hidden rounded-xl p-1.5 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.6)]"
+          className={`glass absolute z-[60] mt-2 w-36 overflow-hidden rounded-xl p-1.5 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.6)] ${
+            align === "left" ? "left-0" : "right-0"
+          }`}
         >
           {OPTIONS.map(({ value, label, Icon }) => {
             const active = pref === value;

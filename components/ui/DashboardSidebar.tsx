@@ -114,7 +114,7 @@ export function DashboardSidebar({
       <div className={cx("mt-auto flex pt-6", collapsed ? "flex-col items-center gap-2" : "flex-col")}>
         {!collapsed && <p className="truncate px-3 text-xs text-muted">{email}</p>}
         <div className={cx("flex items-center", collapsed ? "flex-col gap-2" : "mt-1 justify-between")}>
-          <ThemeToggle />
+          <ThemeToggle align="left" />
           <form action={signOutAction}>
             <button
               type="submit"
