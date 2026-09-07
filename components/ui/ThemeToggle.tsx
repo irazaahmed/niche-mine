@@ -20,7 +20,7 @@ function readPref(): Pref {
   } catch {
     /* ignore */
   }
-  return "dark";
+  return "light";
 }
 
 function SunIcon() {
@@ -69,7 +69,7 @@ const OPTIONS = [
  */
 export function ThemeToggle({ className = "" }: { className?: string }) {
   const [open, setOpen] = useState(false);
-  const [pref, setPref] = useState<Pref>("dark");
+  const [pref, setPref] = useState<Pref>("light");
   const wrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
