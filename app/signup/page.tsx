@@ -10,9 +10,57 @@ const inputClass =
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; checkEmail?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, checkEmail } = await searchParams;
+
+  if (checkEmail) {
+    return (
+      <div className="relative flex min-h-screen items-center justify-center px-4">
+        <div aria-hidden className="fixed inset-0 -z-10 overflow-hidden bg-background">
+          <div className="absolute inset-0 bg-grid-lines opacity-40" />
+          <div className="glow-orb animate-float-slow absolute left-1/2 top-1/3 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 [--glow:color-mix(in_srgb,var(--color-accent)_14%,transparent)]" />
+        </div>
+
+        <Link
+          href="/"
+          className="fixed left-4 top-4 inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm text-muted transition-colors hover:text-foreground sm:left-6 sm:top-6"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="m12 19-7-7 7-7" /><path d="M19 12H5" />
+          </svg>
+          Back to home
+        </Link>
+
+        <div className="glass w-full max-w-sm rounded-3xl p-8 text-center shadow-[0_24px_70px_-30px_var(--color-accent)]">
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent-bright">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M4 4h16v16H4z" opacity="0" />
+              <path d="M3 7l9 6 9-6" />
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+            </svg>
+          </span>
+          <h1 className="mt-5 font-heading text-2xl font-semibold tracking-tight">Check your email</h1>
+          <p className="mt-3 text-sm text-muted">
+            We sent a verification link to <span className="font-medium text-foreground">{checkEmail}</span>. Click
+            it to activate your account, then come back and log in.
+          </p>
+          <p className="mt-4 text-xs text-muted">
+            Don&apos;t see it? Check spam, or{" "}
+            <Link href="/signup" className="text-accent-bright hover:underline">
+              try signing up again
+            </Link>
+            .
+          </p>
+          <Link href="/login" className="mt-6 inline-block">
+            <span className="btn-sheen inline-flex h-12 items-center justify-center rounded-full bg-accent px-6 font-medium text-white transition-all duration-300 hover:bg-accent-bright hover:shadow-[0_0_36px_-6px_var(--color-accent)]">
+              Go to login
+            </span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4">

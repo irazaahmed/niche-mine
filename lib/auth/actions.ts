@@ -21,10 +21,18 @@ export async function signup(formData: FormData) {
   const password = String(formData.get("password") ?? "");
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({ email, password });
 
   if (error) {
     redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+  }
+
+  // No session means Supabase is waiting on email confirmation before it'll
+  // sign the user in — send them to the "check your inbox" state instead of
+  // straight to /dashboard, where middleware would just bounce them back to
+  // /login with no explanation.
+  if (!data.session) {
+    redirect(`/signup?checkEmail=${encodeURIComponent(email)}`);
   }
   redirect("/dashboard");
 }
