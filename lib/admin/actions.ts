@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/current-user";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -39,4 +40,8 @@ export async function deleteUserAction(formData: FormData): Promise<void> {
   // and every niches/... row beneath it cascades from there.
   await supabase.auth.admin.deleteUser(userId);
   revalidatePath("/admin/users");
+  // This action is submitted from the now-deleted user's own detail page
+  // (/admin/users/[id]) — without a redirect, Next.js re-renders that same
+  // route, whose lookup 404s since the row is gone.
+  redirect("/admin/users");
 }
